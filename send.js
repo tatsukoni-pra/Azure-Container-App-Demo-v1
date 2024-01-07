@@ -1,21 +1,29 @@
 const { ServiceBusClient } = require("@azure/service-bus");
+const crypto = require('crypto');
+require('dotenv').config();
 
-const connectionString = ""
+const connectionString = process.env.CONNECTION_STRING;
 
-const queueName = "myqueue"
+const queueName = "mytopic"
 
+// ユニークIDを生成
+const messageId = () => {
+    return crypto.randomUUID() + '--' + new Date().getTime();
+}
+
+// TODO: messageIdを一意にする
 const messages = [
-    { body: "Albert Einstein" },
-    { body: "Werner Heisenberg" },
-    { body: "Marie Curie" },
-    { body: "Steven Hawking" },
-    { body: "Isaac Newton" },
-    { body: "Niels Bohr" },
-    { body: "Michael Faraday" },
-    { body: "Galileo Galilei" },
-    { body: "Johannes Kepler" },
-    { body: "Nikolaus Kopernikus" }
- ];
+    { body: "Albert Einstein", messageId: messageId() },
+    { body: "Werner Heisenberg", messageId: messageId() },
+    { body: "Marie Curie", messageId: messageId() },
+    { body: "Steven Hawking", messageId: messageId() },
+    { body: "Isaac Newton", messageId: messageId() },
+    { body: "Niels Bohr", messageId: messageId() },
+    { body: "Michael Faraday", messageId: messageId() },
+    { body: "Galileo Galilei", messageId: messageId() },
+    { body: "Johannes Kepler", messageId: messageId() },
+    { body: "Nikolaus Kopernikus", messageId: messageId() }
+];
 
 async function main() {
     // create a Service Bus client using the connection string to the Service Bus namespace
