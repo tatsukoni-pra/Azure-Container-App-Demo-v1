@@ -19,6 +19,7 @@ env:
   RESOURCE_GROUP: tatsukoni-test-v2
   SERVIVE_BUS_NAMESPACE: sb-tatsukoni-demo-v1
   SERVICE_BUS_TOPIC_NAME: mytopic
+  COSMOS_CONNECTION_STRING: ${{ secrets.COSMOS_CONNECTION_STRING }}
 
 jobs:
   # container imageをレジストリにbuild & pushする
@@ -32,11 +33,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
-      - name: Setup Node ${{ env.NODE_VERSION }} Environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
 
       - name: Azure Login
         uses: azure/login@v1
@@ -118,6 +114,107 @@ jobs:
             --subscription-name ${{ steps.current-active-subscription.outputs.CURRENT_ACTIVE_SUBSCRIPTION }} \
             --name ${{ steps.current-not-active-subscription.outputs.CURRENT_ACTIVE_SUBSCRIPTION_FILTER }} \
             --filter-sql-expression 1=0
+
+      - name: "Logout via Azure CLI"
+        run: |
+          az logout
+
+  # container appをデプロイする
+  # TODO: Templateファイルを使ってデプロイする
+  # TODO: 機密の環境変数はSecretで管理する
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, stop-queue]
+    outputs:
+      CURRENT_CONTAINER_REVISION: ${{ steps.current-container-revision.outputs.CURRENT_CONTAINER_REVISION }}
+      DEPLOY_CONTAINER_REVISION: ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }}
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_CONTAINER_DEPLOY }}
+
+      # デプロイ実施前に、現在稼働しているコンテナのリビジョンを取得しておく
+      - name: Get Current Container Revision
+        id: current-container-revision
+        run: |
+          currentContainerRevision=$(az containerapp list \
+            --environment ${{ env.CONTAINER_APP_ENVIRONMENT }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "[].properties.latestRevisionName" \
+            -o tsv)
+          echo "CURRENT_CONTAINER_REVISION=$currentContainerRevision" >> $GITHUB_OUTPUT
+
+      - name: Set Deploy Container Revision
+        id: deploy-container-revision
+        run: |
+          echo "DEPLOY_CONTAINER_REVISION=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Deploy container app
+        run: |
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az containerapp create \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --environment ${{ env.CONTAINER_APP_ENVIRONMENT }} \
+            --min-replicas 1 \
+            --max-replicas 1 \
+            --revision-suffix ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
+            --env-vars \
+              "SUBSCRIPTION_NAME=${{ needs.stop-queue.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}" \
+              "REVISION_SUFFIX=${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
+              "CONNECTION_STRING=${{ secrets.SERVICE_BUS_CONNECTION_STRING }} \
+              "COSMOS_CONNECTION_STRING=${{ env.COSMOS_CONNECTION_STRING }} \
+            --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.REPOSITORY_NAME }}:${{ needs.build.outputs.CONTAINER_IMAGE_TAG }} \
+            --registry-username ${{ env.AZURE_CONTAINER_REGISTRY }} \
+            --registry-password ${{ secrets.REGISTRY_PASSWORD }} \
+            --registry-server ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io \
+            --revisions-mode multiple
+
+      - name: "Logout via Azure CLI"
+        run: |
+          az logout
+
+  # 稼働中のワーカー処理が0になったら、旧コンテナリビジョンを非アクティブ化する
+  deactivate-old-revision:
+    runs-on: ubuntu-latest
+    needs: [build, stop-queue, deploy]
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_CONTAINER_DEPLOY }}
+
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Check and wait
+        id: check_loop
+        run: |
+          for i in {1..10}; do
+            count=$(node count.js)
+            echo "Attempt $i: Process count is $count"
+            if [ "$count" == "0" ]; then
+              echo "WORKER_COUNT=0" >> $GITHUB_ENV
+              break
+            elif [ "$i" -eq 10 ]; then
+              echo "WORKER_COUNT=$count" >> $GITHUB_ENV
+              echo "Process count is not 0. Exit." >&2
+              exit 1
+            else
+              sleep 30
+            fi
+          done
+
+      - name: Deactivate old container revision
+        if: env.WORKER_COUNT.count == '0'
+        run: |
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az containerapp revision deactivate \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --revision ${{ needs.deploy.outputs.CURRENT_CONTAINER_REVISION }} \
 
       - name: "Logout via Azure CLI"
         run: |
