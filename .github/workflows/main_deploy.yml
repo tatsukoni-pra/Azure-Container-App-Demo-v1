@@ -169,18 +169,18 @@ jobs:
 
       - name: Deploy container app
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.replica_count }}" -gt 0 ]; then
-            echo "REPLICA_COUNT=${{ github.event.inputs.replica_count }}" >> $GITHUB_ENV
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            REPLICA_COUNT="${{ github.event.inputs.replica_count }}"
           else
-            echo "REPLICA_COUNT=1" >> $GITHUB_ENV
+            REPLICA_COUNT="1"
           fi
-          echo "Deploy container app with replica count: ${{ env.REPLICA_COUNT }}"
+          echo "Deploy container app with replica count: $REPLICA_COUNT"
           az containerapp create \
             --name ${{ env.CONTAINER_APP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --environment ${{ env.CONTAINER_APP_ENVIRONMENT }} \
-            --min-replicas ${{ env.REPLICA_COUNT }} \
-            --max-replicas ${{ env.REPLICA_COUNT }} \
+            --min-replicas $REPLICA_COUNT \
+            --max-replicas $REPLICA_COUNT \
             --revision-suffix ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
             --env-vars \
               "SUBSCRIPTION_NAME=${{ needs.stop-queue.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}" \
