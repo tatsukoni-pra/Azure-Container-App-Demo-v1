@@ -81,7 +81,7 @@ jobs:
         id: current-active-subscription
         run: |
           currentActiveSubscription=$(az containerapp list \
-            --environment ${{ env.AZURE_CONTAINER_REGISTRY }} \
+            --environment ${{ env.CONTAINER_APP_ENVIRONMENT }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --query "[].properties.template.containers[].env[]" -o json | jq -r '.[] | select(.name=="SUBSCRIPTION_NAME").value')
           echo "CURRENT_ACTIVE_SUBSCRIPTION=$currentActiveSubscription" >> $GITHUB_OUTPUT
