@@ -152,7 +152,6 @@ jobs:
 
       - name: Deploy container app
         run: |
-          az config set extension.use_dynamic_install=yes_without_prompt
           az containerapp create \
             --name ${{ env.CONTAINER_APP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -211,7 +210,6 @@ jobs:
       - name: Deactivate old container revision
         if: env.WORKER_COUNT.count == '0'
         run: |
-          az config set extension.use_dynamic_install=yes_without_prompt
           az containerapp revision deactivate \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --revision ${{ needs.deploy.outputs.CURRENT_CONTAINER_REVISION }} \
