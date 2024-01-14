@@ -31,8 +31,8 @@ async function processMessage(message) {
   };
   await container.items.create(newItem);
 
-  // 10秒待機
-  await wait(10000);
+  // 5分待機
+  await wait(300000);
   console.log(`Finish v2 Received message: ${message.body}`);
   // コスモスDBレコード ステータス更新
   await container
