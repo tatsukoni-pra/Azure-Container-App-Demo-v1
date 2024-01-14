@@ -8,6 +8,10 @@ on:
 
 env:
   NODE_VERSION: '18.x'
+  AZURE_CONTAINER_REGISTRY: acrtatsukonidemov1
+  REPOSITORY_NAME: servicebus-receiver
+  CONTAINER_APP_NAME: my-container-app-v1
+  RESOURCE_GROUP: tatsukoni-test-v2
 
 jobs:
   build:
@@ -16,10 +20,35 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Hello World'
-        run: echo "Hello World"
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_CONTAINER_DEPLOY }}
+
+      - name: Log in to container registry
+        id: acrtoken
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+
+      - name: Set container image tag
+        id: tag
+        run: |
+          echo "CONTAINER_IMAGE_TAG=$(date +%Y%m%d%H%M%S)-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.REPOSITORY_NAME }}:${{ steps.tag.outputs.CONTAINER_IMAGE_TAG }}
+          file: ./Dockerfile
+          context: ./
