@@ -42,6 +42,7 @@ jobs:
   # container imageをレジストリにbuild & pushする
   build:
     runs-on: ubuntu-latest
+    needs: validate-inputs
     outputs:
       CONTAINER_IMAGE_TAG: ${{ steps.tag.outputs.CONTAINER_IMAGE_TAG }}
     steps:
@@ -78,7 +79,7 @@ jobs:
   # Service Bus のキュー配信を停止(サブスクリプションルールを入れ替える)
   stop-queue:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [validate-inputs, build]
     outputs:
       CURRENT_ACTIVE_SUBSCRIPTION: ${{ steps.current-active-subscription.outputs.CURRENT_ACTIVE_SUBSCRIPTION }}
       CURRENT_ACTIVE_SUBSCRIPTION_FILTER: ${{ steps.current-not-active-subscription.outputs.CURRENT_ACTIVE_SUBSCRIPTION_FILTER }}
@@ -141,7 +142,7 @@ jobs:
   # TODO: 機密の環境変数はSecretで管理する
   deploy:
     runs-on: ubuntu-latest
-    needs: [build, stop-queue]
+    needs: [validate-inputs, build, stop-queue]
     outputs:
       CURRENT_CONTAINER_REVISION: ${{ steps.current-container-revision.outputs.CURRENT_CONTAINER_REVISION }}
       DEPLOY_CONTAINER_REVISION: ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }}
@@ -200,7 +201,7 @@ jobs:
   # 稼働中のワーカー処理が0になったら、旧コンテナリビジョンを非アクティブ化する
   deactivate-old-revision:
     runs-on: ubuntu-latest
-    needs: [build, stop-queue, deploy]
+    needs: [validate-inputs, build, stop-queue, deploy]
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
