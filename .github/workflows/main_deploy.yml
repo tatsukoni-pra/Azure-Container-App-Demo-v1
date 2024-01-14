@@ -102,6 +102,8 @@ jobs:
       # キューはAt Least Onceで配信しているので、先に両方のサブスクリプションを有効化してから、現在配信中のサブスクリプションを停止する
       - name: Update subscription rule
         run: |
+          echo "Current Active Subscription: ${{ steps.current-active-subscription.outputs.CURRENT_ACTIVE_SUBSCRIPTION }}"
+          echo "Current Not Active Subscription: ${{ steps.current-not-active-subscription.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}"
           az servicebus topic subscription rule update \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --namespace-name ${{ env.SERVIVE_BUS_NAMESPACE }} \
