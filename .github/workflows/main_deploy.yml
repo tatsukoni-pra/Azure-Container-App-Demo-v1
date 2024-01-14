@@ -30,11 +30,10 @@ jobs:
   # ワークフローディスパッチ手動実行時の入力値検証
   validate-inputs:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Validate replica count
         run: |
-          if ! [[ "${{ github.event.inputs.replica_count }}" =~ ^[1-9][0-9]*$ ]]; then
+          if [ "${{ github.event_name }}" == 'workflow_dispatch' ] && ! [[ "${{ github.event.inputs.replica_count }}" =~ ^[1-9][0-9]*$ ]]; then
             echo "replica_count は1以上の整数を指定してください。" >&2
             exit 1
           fi
