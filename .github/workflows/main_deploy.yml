@@ -161,9 +161,9 @@ jobs:
             --revision-suffix ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
             --env-vars \
               "SUBSCRIPTION_NAME=${{ needs.stop-queue.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}" \
-              "REVISION_SUFFIX=${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
-              "CONNECTION_STRING=${{ secrets.SERVICE_BUS_CONNECTION_STRING }} \
-              "COSMOS_CONNECTION_STRING=${{ env.COSMOS_CONNECTION_STRING }} \
+              "REVISION_SUFFIX=${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }}" \
+              "CONNECTION_STRING=${{ secrets.SERVICE_BUS_CONNECTION_STRING }}" \
+              "COSMOS_CONNECTION_STRING=${{ env.COSMOS_CONNECTION_STRING }}" \
             --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.REPOSITORY_NAME }}:${{ needs.build.outputs.CONTAINER_IMAGE_TAG }} \
             --registry-username ${{ env.AZURE_CONTAINER_REGISTRY }} \
             --registry-password ${{ secrets.REGISTRY_PASSWORD }} \
