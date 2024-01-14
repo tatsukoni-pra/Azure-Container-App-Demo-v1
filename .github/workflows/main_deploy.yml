@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   NODE_VERSION: '18.x'
   AZURE_CONTAINER_REGISTRY: acrtatsukonidemov1
@@ -38,7 +41,14 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+            accessToken=$(az acr login -n ${{ env.AZURE_CONTAINER_REGISTRY }} --expose-token --query accessToken -o tsv)
+            echo "token=$accessToken" >> $GITHUB_OUTPUT
+      - name: Login to ACR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ steps.acrtoken.outputs.token }}
 
       - name: Set container image tag
         id: tag
