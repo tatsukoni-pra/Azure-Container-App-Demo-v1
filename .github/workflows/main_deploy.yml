@@ -200,7 +200,7 @@ jobs:
         id: check_loop
         run: |
           for i in {1..10}; do
-            count=$(node ./count.js)
+            count=$(node count.js ${{ needs.deploy.outputs.CURRENT_CONTAINER_REVISION }})
             echo "Attempt $i: Process count is $count"
             if [ "$count" == "0" ]; then
               echo "WORKER_COUNT=0" >> $GITHUB_ENV
