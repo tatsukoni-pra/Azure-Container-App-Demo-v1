@@ -192,6 +192,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Install Node Modules
+        run: |
+          npm install
+
       - name: Check and wait
         id: check_loop
         run: |
