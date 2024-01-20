@@ -38,7 +38,7 @@ async function processMessage(message) {
 }
 
 async function createStartLog(message) {
-  console.log(`Start v2 Received message: ${message.body}`);
+  console.log(getCurrentDateTime() + `Start id: ${message.messageId} message: ${message.body}`);
   const newItem = {
     id: message.messageId,
     containerName: revisionName,
@@ -48,12 +48,24 @@ async function createStartLog(message) {
 }
 
 async function createFinishLog(message) {
-  console.log(`Finish v2 Received message: ${message.body}`);
+  console.log(getCurrentDateTime() + `Finish id: ${message.messageId} message: ${message.body}`);
   await container
     .item(message.messageId, message.messageId)
     .patch([
       { op: "replace", path: "/status", value: STATUS_DONE }
     ]);
+}
+
+function getCurrentDateTime() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+
+  return `【${year}-${month}-${day} ${hours}:${minutes}:${seconds}】`;
 }
 
 export { processMessage };
