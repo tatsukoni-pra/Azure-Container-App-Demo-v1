@@ -1,5 +1,6 @@
-const { CosmosClient } = require("@azure/cosmos");
-require('dotenv').config();
+import { CosmosClient } from '@azure/cosmos';
+import { config } from 'dotenv';
+config();
 
 const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING);
 const database = client.database("TatsukoniTest2");
