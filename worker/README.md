@@ -8,6 +8,7 @@ node worker/worker.js
 
 ## 複数のワーカー処理を並行実行させる
 - ワーカー処理部分を、非同期関数（`async function processMessage(message)`）として定義しておくことで、ワーカー処理を非同期に（複数処理を並行で）実行させる
+- CPUではなく、I/Oがボトルネックになっている処理のため、Promise（非同期I/O）を用いている。[参考1](https://qiita.com/suin/items/bce351c812603d413841)　[参考2](https://blog.recruit.co.jp/rls/2019-12-13-node-async-io/)
 - [該当箇所のコード](https://github.com/tatsukoni-pra/Azure-Container-App-Demo-v1/blob/main/worker/workers/RootWorker.js#L20)
 
 ## 並行処理実行数を制限する
