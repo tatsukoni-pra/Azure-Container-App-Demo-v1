@@ -4,13 +4,17 @@ node worker/worker.js
 ```
 
 # 動作原理
+![worker](https://github.com/tatsukoni-pra/Azure-Container-App-Demo-v1/assets/90994143/30b5eb08-4b94-43cf-81db-9d03562164fc)
+
 ## 複数のワーカー処理を並行実行させる
 - ワーカー処理部分を、非同期関数（`async function processMessage(message)`）として定義しておくことで、ワーカー処理を非同期に（複数処理を並行で）実行させる
+- [該当箇所のコード](https://github.com/tatsukoni-pra/Azure-Container-App-Demo-v1/blob/main/worker/workers/RootWorker.js#L20)
 
 ## 並行処理実行数を制限する
 - `let processingMessageIds = [];`を定義し、処理中のメッセージidを逐一格納していく
 - 非同期処理が完了したら（`Promise.prototype.finally()`）、`processingMessageIds`から、対象処理のメッセージidを削除する
 - `processingMessageIds`の中身が指定数以上の場合は、任意の秒数待機 & 再度`processingMessageIds`を数える を繰り返すことで、指定数以上の処理が並行実行されないように制御する。
+- [該当箇所のコード](https://github.com/tatsukoni-pra/Azure-Container-App-Demo-v1/blob/main/worker/worker.js#L23)
 
 コード例
 ```javascript
