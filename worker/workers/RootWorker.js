@@ -18,6 +18,12 @@ const STATUS_PROCESSING = 'processing';
 const STATUS_DONE = 'done';
 
 async function processMessage(message) {
+  // 既に処理が実行済 or 処理中の場合は処理をスキップ
+  if (await checkDuplicate(message)) {
+    console.log(getCurrentDateTime() + `Skip Because of Duplicate id: ${message.messageId} message: ${message.body}`);
+    return;
+  }
+
   // Start
   await createStartLog(message);
 
@@ -45,6 +51,14 @@ async function createStartLog(message) {
     status: STATUS_PROCESSING,
   };
   await container.items.create(newItem);
+}
+
+async function checkDuplicate(message) {
+  const query = `SELECT VALUE COUNT(1) FROM c WHERE c.id = @id`;
+  const { resources: count } = await container.items
+    .query({ query, parameters: [{ name: "@id", value: message.messageId }] })
+    .fetchAll();
+  return count[0] != 0;
 }
 
 async function createFinishLog(message) {
