@@ -1,4 +1,7 @@
 {
+  "name": "your-app",
+  "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
     "@azure/service-bus": "^7.9.3",

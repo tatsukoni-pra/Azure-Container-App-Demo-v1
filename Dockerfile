@@ -6,4 +6,4 @@ COPY . .
 RUN apt-get update && apt-get install -y procps && \
   npm install
 
-CMD ["node", "worker.js"]
+CMD ["node", "worker/worker.js"]
