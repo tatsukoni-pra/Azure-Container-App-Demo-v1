@@ -23,13 +23,13 @@ async function main() {
   receiver.subscribe({
       processMessage: async (message) => {
         processingMessageIds.push(message.messageId);
-          processMessage(message).finally(() => {
-            processingMessageIds = processingMessageIds.filter(id => id !== message.messageId);
-          });
-          // 実行中のワーカー処理数が5以上の場合は、5以下になるまで待機する
-          while (processingMessageIds.length >= PARALLEL_PROCESS_COUNT) {
-            await wait(1000); // 1秒待機
-          }
+        processMessage(message).finally(() => {
+          processingMessageIds = processingMessageIds.filter(id => id !== message.messageId);
+        });
+        // 実行中のワーカー処理数が5以上の場合は、5以下になるまで待機する
+        while (processingMessageIds.length >= PARALLEL_PROCESS_COUNT) {
+          await wait(1000); // 1秒待機
+        }
       },
       processError: async (error) => {
         console.log(error);
