@@ -30,6 +30,8 @@ async function main() {
         while (processingMessageIds.length >= PARALLEL_PROCESS_COUNT) {
           await wait(1000); // 1秒待機
         }
+        // 複数コンテナで処理を分散させるために、ランダムな時間待機する
+        await wait(Math.random() * 1000);
       },
       processError: async (error) => {
         console.log(error);

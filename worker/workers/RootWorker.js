@@ -20,7 +20,7 @@ const STATUS_DONE = 'done';
 async function processMessage(message) {
   // 既に処理が実行済 or 処理中の場合は処理をスキップ
   if (await checkDuplicate(message)) {
-    console.log(getCurrentDateTime() + `Skip Because of Duplicate id: ${message.messageId} message: ${message.body}`);
+    console.log(getCurrentDateTime() + `Skip Because of Duplicate id: ${message.messageId} type: ${message.body.type}`);
     return;
   }
 
@@ -28,7 +28,9 @@ async function processMessage(message) {
   await createStartLog(message);
 
   // 実処理は各ワーカーに移譲
-  switch (message.body) {
+  // TODO: 分岐増えてきたら、配列でマッピング管理みたいにできないか？
+  // TODO: 分岐ごと別ファイルに分ける。ここだけ編集できるようにする
+  switch (message.body.type) {
     case "Albert Einstein":
       await albertProcessMessage(message);
       break;
@@ -44,7 +46,7 @@ async function processMessage(message) {
 }
 
 async function createStartLog(message) {
-  console.log(getCurrentDateTime() + `Start id: ${message.messageId} message: ${message.body}`);
+  console.log(getCurrentDateTime() + `Start id: ${message.messageId} type: ${message.body.type}`);
   const newItem = {
     id: message.messageId,
     containerName: revisionName,
@@ -62,7 +64,7 @@ async function checkDuplicate(message) {
 }
 
 async function createFinishLog(message) {
-  console.log(getCurrentDateTime() + `Finish id: ${message.messageId} message: ${message.body}`);
+  console.log(getCurrentDateTime() + `Finish id: ${message.messageId} type: ${message.body.type}`);
   await container
     .item(message.messageId, message.messageId)
     .patch([

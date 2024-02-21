@@ -4,6 +4,8 @@
 import { wait } from '../utils/util.js';
 
 async function albertProcessMessage(message) {
+  console.log('user_id: ' + message.body.content.user_id);
+  console.log('text: ' + message.body.content.text);
   // 10~30秒待機
   await wait(getRandomInt(10000, 30000));
 }

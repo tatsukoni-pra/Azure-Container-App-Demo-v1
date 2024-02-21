@@ -12,16 +12,45 @@ const messageId = () => {
 }
 
 const messages = [
-    { body: "Albert Einstein", messageId: messageId() },
-    { body: "Werner Heisenberg", messageId: messageId() },
-    { body: "Marie Curie", messageId: messageId() },
-    { body: "Steven Hawking", messageId: messageId() },
-    { body: "Isaac Newton", messageId: messageId() },
-    { body: "Niels Bohr", messageId: messageId() },
-    { body: "Michael Faraday", messageId: messageId() },
-    { body: "Galileo Galilei", messageId: messageId() },
-    { body: "Johannes Kepler", messageId: messageId() },
-    { body: "Nikolaus Kopernikus", messageId: messageId() }
+    { 
+        body: {
+            "type": "Albert Einstein",
+            "content": {
+                "user_id": 1,
+                "text": "hello world",
+            }
+        },
+        messageId: messageId()
+    },
+    // { body: "Werner Heisenberg", messageId: messageId() },
+    // { body: "Marie Curie", messageId: messageId() },
+    // { body: "Steven Hawking", messageId: messageId() },
+    // { body: "Isaac Newton", messageId: messageId() },
+    // { body: "Niels Bohr", messageId: messageId() },
+    // { body: "Michael Faraday", messageId: messageId() },
+    // { body: "Galileo Galilei", messageId: messageId() },
+    // { body: "Johannes Kepler", messageId: messageId() },
+    // { body: "Nikolaus Kopernikus", messageId: messageId() },
+    // { body: "Albert Einstein", messageId: messageId() },
+    // { body: "Werner Heisenberg", messageId: messageId() },
+    // { body: "Marie Curie", messageId: messageId() },
+    // { body: "Steven Hawking", messageId: messageId() },
+    // { body: "Isaac Newton", messageId: messageId() },
+    // { body: "Albert Einstein", messageId: messageId() },
+    // { body: "Werner Heisenberg", messageId: messageId() },
+    // { body: "Marie Curie", messageId: messageId() },
+    // { body: "Steven Hawking", messageId: messageId() },
+    // { body: "Isaac Newton", messageId: messageId() },
+    // { body: "Niels Bohr", messageId: messageId() },
+    // { body: "Michael Faraday", messageId: messageId() },
+    // { body: "Galileo Galilei", messageId: messageId() },
+    // { body: "Johannes Kepler", messageId: messageId() },
+    // { body: "Nikolaus Kopernikus", messageId: messageId() },
+    // { body: "Albert Einstein", messageId: messageId() },
+    // { body: "Werner Heisenberg", messageId: messageId() },
+    // { body: "Marie Curie", messageId: messageId() },
+    // { body: "Steven Hawking", messageId: messageId() },
+    // { body: "Isaac Newton", messageId: messageId() },
 ];
 
 async function main() {
