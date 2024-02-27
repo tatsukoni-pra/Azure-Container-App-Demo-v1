@@ -137,8 +137,6 @@ jobs:
           az logout
 
   # container appをデプロイする
-  # TODO: Templateファイルを使ってデプロイする
-  # TODO: 機密の環境変数はSecretで管理する
   deploy:
     runs-on: ubuntu-latest
     needs: [validate-inputs, build, stop-queue]
@@ -185,8 +183,8 @@ jobs:
             --env-vars \
               "SUBSCRIPTION_NAME=${{ needs.stop-queue.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}" \
               "REVISION_SUFFIX=${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }}" \
-              "CONNECTION_STRING=${{ secrets.SERVICE_BUS_CONNECTION_STRING }}" \
-              "COSMOS_CONNECTION_STRING=${{ env.COSMOS_CONNECTION_STRING }}" \
+              "CONNECTION_STRING=secretref:service-bus-connection-string" \
+              "COSMOS_CONNECTION_STRING=secretref:cosmos-connection-string" \
             --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.REPOSITORY_NAME }}:${{ needs.build.outputs.CONTAINER_IMAGE_TAG }} \
             --registry-username ${{ env.AZURE_CONTAINER_REGISTRY }} \
             --registry-password ${{ secrets.REGISTRY_PASSWORD }} \
