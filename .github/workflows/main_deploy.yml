@@ -21,10 +21,11 @@ env:
   REPOSITORY_NAME: servicebus-receiver
   CONTAINER_APP_NAME: my-container-app-v1
   CONTAINER_APP_ENVIRONMENT: my-environment-v1
+  CONTAINER_MANAGED_IDENTITY_RESOURCE_ID: /subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1
   RESOURCE_GROUP: tatsukoni-test-v2
   SERVIVE_BUS_NAMESPACE: sb-tatsukoni-demo-v1
   SERVICE_BUS_TOPIC_NAME: mytopic
-  COSMOS_CONNECTION_STRING: ${{ secrets.COSMOS_CONNECTION_STRING }}
+  KEY_CONTAINER_NAME: kv-tatsukoni-demo-v1
 
 jobs:
   # ワークフローディスパッチ手動実行時の入力値検証
@@ -180,10 +181,10 @@ jobs:
             --min-replicas $REPLICA_COUNT \
             --max-replicas $REPLICA_COUNT \
             --revision-suffix ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
-            --user-assigned /subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1 \
+            --user-assigned ${{ env.CONTAINER_MANAGED_IDENTITY_RESOURCE_ID }} \
             --secrets \
-              "service-bus-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/SERVICE-BUS-CONNECTION-STRING/a97b5c3b058840e6b17dadff37794f19,identityref:/subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1" \
-              "cosmos-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/COSMOS-CONNECTION-STRING/bb3ecc5462744c2dae8f783da7a2e5fd,identityref:/subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1" \
+              "service-bus-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/SERVICE-BUS-CONNECTION-STRING/a97b5c3b058840e6b17dadff37794f19,identityref:${{ env.CONTAINER_MANAGED_IDENTITY_RESOURCE_ID }}" \
+              "cosmos-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/COSMOS-CONNECTION-STRING/bb3ecc5462744c2dae8f783da7a2e5fd,identityref:${{ env.CONTAINER_MANAGED_IDENTITY_RESOURCE_ID }}" \
             --env-vars \
               "SUBSCRIPTION_NAME=${{ needs.stop-queue.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}" \
               "REVISION_SUFFIX=${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }}" \
@@ -223,7 +224,7 @@ jobs:
 
       - name: Retrieve secret from Azure Key Vault
         run: |
-          secret=$(az keyvault secret show --name COSMOS-CONNECTION-STRING --vault-name kv-tatsukoni-demo-v1 --query value -o tsv)
+          secret=$(az keyvault secret show --name COSMOS-CONNECTION-STRING --vault-name ${{ env.KEY_CONTAINER_NAME }} --query value -o tsv)
           echo "COSMOS_CONNECTION_STRING=$secret" >> $GITHUB_ENV
 
       - name: Check and wait
