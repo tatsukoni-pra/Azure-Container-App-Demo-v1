@@ -180,7 +180,7 @@ jobs:
             --min-replicas $REPLICA_COUNT \
             --max-replicas $REPLICA_COUNT \
             --revision-suffix ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
-            --user-assigned /subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1
+            --user-assigned /subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1 \
             --secrets \
               "service-bus-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/SERVICE-BUS-CONNECTION-STRING/a97b5c3b058840e6b17dadff37794f19,identityref:/subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1" \
               "cosmos-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/COSMOS-CONNECTION-STRING/bb3ecc5462744c2dae8f783da7a2e5fd,identityref:/subscriptions/ba29533e-1e4c-43a8-898a-a5815e9b577b/resourceGroups/tatsukoni-test-v2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-my-container-app-v1" \
