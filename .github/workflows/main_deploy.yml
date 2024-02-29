@@ -221,10 +221,10 @@ jobs:
         run: |
           npm install
 
-      # - name: Retrieve secret from Azure Key Vault
-      #   run: |
-      #     secret=$(az keyvault secret show --name COSMOS-CONNECTION-STRING --vault-name kv-tatsukoni-demo-v1 --query value -o tsv)
-      #     echo "COSMOS_CONNECTION_STRING=$secret" >> $GITHUB_ENV
+      - name: Retrieve secret from Azure Key Vault
+        run: |
+          secret=$(az keyvault secret show --name COSMOS-CONNECTION-STRING --vault-name kv-tatsukoni-demo-v1 --query value -o tsv)
+          echo "COSMOS_CONNECTION_STRING=$secret" >> $GITHUB_ENV
 
       - name: Check and wait
         id: check_loop
