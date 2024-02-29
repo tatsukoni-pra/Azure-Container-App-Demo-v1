@@ -186,7 +186,6 @@ jobs:
             --env-vars \
               "SUBSCRIPTION_NAME=${{ needs.stop-queue.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}" \
               "REVISION_SUFFIX=${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }}" \
-              "TEST=secretref:test-key" \
               "CONNECTION_STRING=secretref:service-bus-connection-string" \
               "COSMOS_CONNECTION_STRING=secretref:cosmos-connection-string" \
             --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.REPOSITORY_NAME }}:${{ needs.build.outputs.CONTAINER_IMAGE_TAG }} \
