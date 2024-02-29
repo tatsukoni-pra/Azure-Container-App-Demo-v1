@@ -181,8 +181,8 @@ jobs:
             --max-replicas $REPLICA_COUNT \
             --revision-suffix ${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }} \
             --secrets \
-              "service-bus-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/SERVICE-BUS-CONNECTION-STRING/a97b5c3b058840e6b17dadff37794f19,identityref:7e0cadd0-8217-4fba-8416-b679139a585a" \
-              "cosmos-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/COSMOS-CONNECTION-STRING/bb3ecc5462744c2dae8f783da7a2e5fd,identityref:7e0cadd0-8217-4fba-8416-b679139a585a" \
+              "service-bus-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/SERVICE-BUS-CONNECTION-STRING/a97b5c3b058840e6b17dadff37794f19,identityref:86824aae-b862-4961-bc6b-2b51af556d03" \
+              "cosmos-connection-string=keyvaultref:https://kv-tatsukoni-demo-v1.vault.azure.net/secrets/COSMOS-CONNECTION-STRING/bb3ecc5462744c2dae8f783da7a2e5fd,identityref:86824aae-b862-4961-bc6b-2b51af556d03" \
             --env-vars \
               "SUBSCRIPTION_NAME=${{ needs.stop-queue.outputs.CURRENT_NOT_ACTIVE_SUBSCRIPTION }}" \
               "REVISION_SUFFIX=${{ steps.deploy-container-revision.outputs.DEPLOY_CONTAINER_REVISION }}" \
