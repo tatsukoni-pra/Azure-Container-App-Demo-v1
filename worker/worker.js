@@ -8,14 +8,15 @@ import { config } from 'dotenv';
 config();
 
 const connectionString = process.env.CONNECTION_STRING;
-const queueName = "myqueue";
+const topicName = "myqueue";
+const subscriptionName = process.env.SUBSCRIPTION_NAME;
 
 // 同時に処理するプロセス数
 const PARALLEL_PROCESS_COUNT = 5;
 
 async function main() {
   const sbClient = new ServiceBusClient(connectionString);
-  const receiver = sbClient.createReceiver(queueName);
+  const receiver = sbClient.createReceiver(topicName, subscriptionName);
 
   // メッセージを受信する
   let processingMessageIds = [];
