@@ -8,7 +8,7 @@ import { config } from 'dotenv';
 config();
 
 const connectionString = process.env.CONNECTION_STRING;
-const topicName = "myqueue";
+const topicName = "mytopic";
 const subscriptionName = process.env.SUBSCRIPTION_NAME;
 
 // 同時に処理するプロセス数
