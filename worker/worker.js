@@ -8,15 +8,14 @@ import { config } from 'dotenv';
 config();
 
 const connectionString = process.env.CONNECTION_STRING;
-const topicName = "mytopic";
-const subscriptionName = process.env.SUBSCRIPTION_NAME;
+const queueName = "myqueue";
 
 // 同時に処理するプロセス数
 const PARALLEL_PROCESS_COUNT = 5;
 
 async function main() {
   const sbClient = new ServiceBusClient(connectionString);
-  const receiver = sbClient.createReceiver(topicName, subscriptionName);
+  const receiver = sbClient.createReceiver(queueName);
 
   // メッセージを受信する
   let processingMessageIds = [];
@@ -39,11 +38,21 @@ async function main() {
   });
 
   // シグナルを受け取った場合のみ終了処理を行う
-  process.on('SIGINT', async () => {
-      console.log("Closing receiver and client...");
-      await receiver.close();
-      await sbClient.close();
-      process.exit(0);
+  async function gracefulShutdown(signal) {
+    await receiver.close();
+    await sbClient.close();
+    console.error(`処理が異常終了しました。受信されたシグナル: ${signal}`);
+    console.error("実行中だった message IDs:", processingMessageIds);
+    process.exit(1);
+  }
+  process.on("SIGINT", async function () {
+    await gracefulShutdown("SIGINT");
+  });
+  process.on("SIGTERM", async function () {
+    await gracefulShutdown("SIGTERM");
+  });
+  process.on("SIGHUP", async function () {
+    await gracefulShutdown("SIGHUP");
   });
 }
 

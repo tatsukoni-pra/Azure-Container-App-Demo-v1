@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 config();
 
 const connectionString = process.env.CONNECTION_STRING;
-const queueName = "mytopic"
+const queueName = "myqueue"
 
 // ユニークIDを生成
 const messageId = () => {

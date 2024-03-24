@@ -246,7 +246,7 @@ jobs:
           done
 
       - name: Deactivate old container revision
-        if: env.WORKER_COUNT.count == '0'
+        if: env.WORKER_COUNT == '0'
         run: |
           az containerapp revision deactivate \
             --resource-group ${{ env.RESOURCE_GROUP }} \
